@@ -1,6 +1,6 @@
 # Starlink Sierra Leone - Django Full-Stack Application
 
-A complete Django full-stack application for Starlink internet bundles in Sierra Leone with Telegram bot integration, Stripe payment processing, and Orange Money support.
+A complete Django full-stack application for Starlink internet starlink_app in Sierra Leone with Telegram bot integration, Stripe payment processing, and Orange Money support.
 
 ## Project Structure
 
@@ -11,7 +11,7 @@ starlink_django/
 │   ├── urls.py              # Main URL configuration
 │   ├── wsgi.py              # WSGI configuration
 │   └── asgi.py              # ASGI configuration
-├── bundles/                 # Bundles app
+├── starlink_app/                 # starlink_app app
 │   ├── models.py            # Bundle, Order, Subscription models
 │   ├── views.py             # Bundle API views
 │   ├── urls.py              # Bundle URLs
@@ -66,10 +66,10 @@ starlink_django/
 - Subscription activation
 
 ### 5. **API Endpoints**
-- `GET /api/bundles/list/` - List all bundles
-- `GET /api/bundles/<id>/` - Get bundle details
-- `POST /api/bundles/create-order/` - Create new order
-- `GET /api/bundles/order/<order_id>/` - Get order details
+- `GET /api/starlink_app/list/` - List all starlink_app
+- `GET /api/starlink_app/<id>/` - Get bundle details
+- `POST /api/starlink_app/create-order/` - Create new order
+- `GET /api/starlink_app/order/<order_id>/` - Get order details
 - `POST /api/payments/create-intent/` - Create Stripe payment intent
 - `POST /api/payments/webhook/stripe/` - Stripe webhook handler
 - `GET /api/payments/verify/` - Verify payment status
@@ -153,7 +153,7 @@ python manage.py shell
 Then in the Django shell:
 
 ```python
-from bundles.models import Bundle
+from starlink_app.models import Bundle
 from decimal import Decimal
 
 Bundle.objects.create(
@@ -178,7 +178,7 @@ Bundle.objects.create(
     is_popular=False,
 )
 
-# Add more bundles...
+# Add more starlink_app...
 ```
 
 ### Step 6: Run Development Server
@@ -248,16 +248,16 @@ ORANGE_MONEY_API_URL=https://api.orange.com/payment/v1
 
 ## API Usage Examples
 
-### Get All Bundles
+### Get All starlink_app
 
 ```bash
-curl http://localhost:8000/api/bundles/list/
+curl http://localhost:8000/api/starlink_app/list/
 ```
 
 ### Create Order
 
 ```bash
-curl -X POST http://localhost:8000/api/bundles/create-order/ \
+curl -X POST http://localhost:8000/api/starlink_app/create-order/ \
   -H "Content-Type: application/json" \
   -d '{
     "bundle_id": 1,
@@ -269,7 +269,7 @@ curl -X POST http://localhost:8000/api/bundles/create-order/ \
 ### Get Order Details
 
 ```bash
-curl http://localhost:8000/api/bundles/order/ORD-ABC12345/
+curl http://localhost:8000/api/starlink_app/order/ORD-ABC12345/
 ```
 
 ### Create Payment Intent
@@ -284,7 +284,7 @@ curl -X POST http://localhost:8000/api/payments/create-intent/ \
 
 Access Django admin at `http://localhost:8000/admin/`
 
-- Manage bundles
+- Manage starlink_app
 - View orders and subscriptions
 - Track payments
 - Monitor user subscriptions
