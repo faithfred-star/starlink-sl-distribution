@@ -1,4 +1,5 @@
 import os
+import dj_database_url
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -95,3 +96,15 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEBUG = os.getenv("DEBUG", "False") == "True"
+
+SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-key")
+
+ALLOWED_HOSTS = ['*']
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+if 'DATABASE_URL' in os.environ:
+    DATABASES['default'] = dj_database_url.parse(
+        os.environ.get('DATABASE_URL')
+    )
