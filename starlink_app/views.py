@@ -16,12 +16,7 @@ def home(request):
 
 
 def checkout(request):
-    """
-    Checkout page
-    """
     return render(request, 'checkout.html')
-
-
 def payment_instructions(request):
     """
     Stage 2: Capture user details
