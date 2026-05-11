@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+.env
+.venv
+env/
+venv/
+
+# Database (VERY IMPORTANT - don't upload your local DB)
+db.sqlite3
+
+# Static files
+staticfiles/
+
+# Vercel
+.vercel
