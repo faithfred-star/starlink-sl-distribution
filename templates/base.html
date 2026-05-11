@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Starlink SL | Orange Max it</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Satellite Aesthetic Styles */
+        body { background-color: #000; color: #fff; background-image: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1600'); background-size: cover; background-attachment: fixed; font-family: sans-serif; }
+        .glass-card { background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; }
+        .orange-bg { background-color: #ff7900; }
+        .orange-text { color: #ff7900; }
+        .orange-border { border-color: #ff7900; }
+    </style>
+</head>
+<body class="min-h-screen bg-black/60">
+    <nav class="p-6 flex justify-between items-center border-b border-white/10">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 orange-bg rounded-lg"></div>
+            <span class="text-2xl font-black italic tracking-tighter uppercase">Max it</span>
+        </div>
+        <div class="flex items-center gap-4">
+            <span class="text-[10px] uppercase tracking-[4px] opacity-40">Sierra Leone +232</span>
+            <img src="https://upload.wikimedia.org/wikipedia/commons/c/c8/Orange_logo.svg" width="25" alt="Orange">
+        </div>
+    </nav>
+
+    <main class="py-12 px-4">
+        {% block content %}{% endblock %}
+    </main>
+
+    <a href="https://wa.me/16624087180" class="fixed bottom-8 right-8 bg-[#25d366] p-4 rounded-full shadow-2xl transition hover:scale-110 active:rotate-12 z-50">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" width="30" alt="Support">
+    </a>
+
+    <footer class="p-10 text-center opacity-20 text-[9px] uppercase tracking-[5px]">
+        Official Ground Segment Partner &copy; 2026 Orange SL
+    </footer>
+</body>
+</html>

