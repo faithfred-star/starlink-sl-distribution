@@ -1,5 +1,6 @@
-
-django
-requests
+Django>=5.0
 gunicorn
 whitenoise
+requests
+dj-database-url
+psycopg2-binary
