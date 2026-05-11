@@ -15,7 +15,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions', # Required for PIN/OTP flow
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'bundles', # Your app name
+    'starlink_app' # Your app name
 ]
 
 MIDDLEWARE = [

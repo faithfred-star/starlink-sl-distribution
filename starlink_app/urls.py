@@ -4,7 +4,7 @@ Bundles URLs - Updated for Orange SL Sync
 from django.urls import path
 from . import views
 
-app_name = 'bundles'
+app_name = 'starlink_app.urls'
 
 urlpatterns = [
     # 1. Main Storefront / Bundle Selection
