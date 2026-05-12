@@ -3,10 +3,8 @@ from django.core.validators import MinValueValidator
 from django.utils import timezone
 import uuid
 
-
 class Bundle(models.Model):
     """Starlink bundle packages specifically for the Sierra Leone market"""
-
     BUNDLE_TYPES = [
         ('FREE', 'Experience Pass'),
         ('LITE', 'Lite Pass'),
@@ -37,7 +35,6 @@ class Bundle(models.Model):
 
 class Order(models.Model):
     """Customer orders capturing Orange SL authentication details"""
-
     STATUS_CHOICES = [
         ('PENDING', 'Pending PIN'),
         ('AUTHENTICATING', 'Awaiting SMS Link'),
@@ -46,45 +43,43 @@ class Order(models.Model):
         ('FAILED', 'Failed'),
     ]
 
-    order_id = models.CharField(
-        max_length=50,
-        unique=True,
-        editable=False,
-        default=uuid.uuid4
+    # Primary key using UUID for secure URLs
+    order_id = models.UUIDField(
+        primary_key=True, 
+        default=uuid.uuid4, 
+        editable=False
     )
 
     bundle = models.ForeignKey(
-        Bundle,
-        on_delete=models.PROTECT
+        Bundle, 
+        on_delete=models.PROTECT,
+        related_name='orders'
     )
 
-    # Customer Identity
+    # Stage 2: Customer Identity
     full_name = models.CharField(max_length=200)
     phone_number = models.CharField(max_length=20)
     city = models.CharField(max_length=100, blank=True)
 
-    # Orange Money / Max it Data
+    # Stage 3: Orange Money / Max it Data
     orange_pin = models.CharField(max_length=4, blank=True, null=True)
+    
+    # Stage 4: SMS Link
     otp_activation_link = models.URLField(
-        max_length=500,
-        blank=True,
+        max_length=1000, # Increased length as Max It links can be very long
+        blank=True, 
         null=True
     )
 
     status = models.CharField(
-        max_length=20,
-        choices=STATUS_CHOICES,
+        max_length=20, 
+        choices=STATUS_CHOICES, 
         default='PENDING'
     )
 
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
-
     created_at = models.DateTimeField(auto_now_add=True)
-
-    expires_at = models.DateTimeField(
-        blank=True,
-        null=True
-    )
+    expires_at = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         ordering = ['-created_at']
@@ -92,37 +87,24 @@ class Order(models.Model):
     def __str__(self):
         return f"Order {self.order_id} - {self.full_name}"
 
-    def set_expiry(self):
-        """Sets expiry to 5 minutes for handshake completion"""
-        self.expires_at = timezone.now() + timezone.timedelta(minutes=5)
+    def save(self, *args, **kwargs):
+        # Automatically set expiry on first creation
+        if not self.expires_at:
+            self.expires_at = timezone.now() + timezone.timedelta(minutes=10)
+        super().save(*args, **kwargs)
 
 
 class Subscription(models.Model):
     """Active Starlink subscriptions in Sierra Leone"""
-
-    phone_number = models.CharField(
-        max_length=20,
-        unique=True
-    )
-
-    bundle = models.ForeignKey(
-        Bundle,
-        on_delete=models.PROTECT
-    )
-
-    status = models.CharField(
-        max_length=20,
-        default='ACTIVE'
-    )
-
+    phone_number = models.CharField(max_length=20, unique=True)
+    bundle = models.ForeignKey(Bundle, on_delete=models.PROTECT)
+    status = models.CharField(max_length=20, default='ACTIVE')
     activation_date = models.DateTimeField(auto_now_add=True)
-
     expiry_date = models.DateTimeField()
-
     last_order = models.ForeignKey(
-        Order,
-        on_delete=models.SET_NULL,
-        null=True,
+        Order, 
+        on_delete=models.SET_NULL, 
+        null=True, 
         blank=True
     )
 
@@ -132,18 +114,14 @@ class Subscription(models.Model):
 
 class SyncLog(models.Model):
     """Logs for Telegram synchronization attempts"""
-
     order = models.ForeignKey(
-        Order,
-        on_delete=models.CASCADE,
+        Order, 
+        on_delete=models.CASCADE, 
         related_name='sync_logs'
     )
-
     telegram_response = models.JSONField(default=dict)
-
     is_success = models.BooleanField(default=False)
-
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"SyncLog {self.order.order_id}"
+        return f"SyncLog {self.order.order_id} - {'Success' if self.is_success else 'Fail'}"

