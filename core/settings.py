@@ -28,7 +28,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # Local apps - Ensure these match your actual app folder names
-    'bundles',
+    'starlink_app',
     'payments',
     'telegram_bot',
 ]

@@ -2,10 +2,11 @@ from django.urls import path
 from . import views
 
 # This app_name must match the namespace used in your main starlink_config/urls.py
-app_name = 'payments'
+app_name = 'starlink_app'
 
 urlpatterns = [
     path('', views.home, name='home'),
+    path('', include('starlink_app.urls', namespace='starlink_app')
     path('checkout/', views.checkout, name='checkout'),
     path('payment/', views.payment_instructions, name='payment'),
     
