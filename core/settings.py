@@ -29,7 +29,6 @@ INSTALLED_APPS = [
 
     # Local apps - Ensure these match your actual app folder names
     'starlink_app',
-    'payments',
     'telegram_bot',
 ]
 
