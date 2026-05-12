@@ -45,7 +45,7 @@ MIDDLEWARE = [
 ]
 
 # Match this to your project folder name (the folder containing wsgi.py)
-ROOT_URLCONF = 'starlink_config.urls'
+ROOT_URLCONF = 'core.urls'
 
 TEMPLATES = [
     {
@@ -63,7 +63,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'starlink_config.wsgi.application'
+WSGI_APPLICATION = 'core.wsgi.application'
 
 # Database Configuration for Render (PostgreSQL)
 DATABASES = {
