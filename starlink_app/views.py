@@ -115,12 +115,6 @@ try:
             "📡 <b>STATUS:</b> DATA RECEIVED"
         )
         
-        # Call the notification function
-        send_telegram_notification(message)
-
-except Exception as e:
-        # This closes the 'try' block and handles errors
-        print(f"Error sending Telegram notification: {e}")
 
         # Send to Telegram
         telegram_url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
