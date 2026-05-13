@@ -11,21 +11,14 @@
             alt="Orange Max It">
 
         <div class="absolute inset-0 bg-black/20"></div>
-
         <div class="absolute bottom-0 left-0 w-full h-10 bg-white rounded-t-[35px]"></div>
     </div>
 
     <div class="bg-white flex-1 px-8 pt-6 pb-10">
 
         <div class="mb-10">
-            <p class="text-xs uppercase tracking-[4px] text-gray-400 font-bold mb-2">
-                Orange Max It
-            </p>
-
-            <h1 class="text-3xl font-black text-black leading-tight">
-                Verify Link
-            </h1>
-
+            <p class="text-xs uppercase tracking-[4px] text-gray-400 font-bold mb-2">Orange Max It</p>
+            <h1 class="text-3xl font-black text-black leading-tight">Verify Link</h1>
             <p class="text-sm text-gray-500 mt-3 leading-relaxed">
                 Paste the SMS activation link to complete your order.
             </p>
@@ -43,7 +36,6 @@
                     <svg class="w-5 h-5 text-gray-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.1-1.1m-.758-4.9a4 4 0 005.656 0l4-4a4 4 0 10-5.656-5.656l-1.1 1.1"/>
                     </svg>
-
                     <input
                         type="url"
                         id="otp_link"
@@ -63,16 +55,17 @@
                     Confirm Authentication
                 </button>
             </div> 
-            <div class="resend-section" style="margin-top: 20px; text-align: center;">
-    <p id="timer-display" style="color: #666; font-size: 14px;">
-        Link expires in <span id="countdown" style="font-weight: bold; color: #ff6600;">21</span>s
-    </p>
 
-    <button id="resend-btn" onclick="handleResend()" disabled 
-        style="display: none; background: none; border: none; color: #ff6600; text-weight: bold; cursor: pointer;">
-        Resend Verification Link
-    </button>
-</div>
+            <div class="resend-section" style="margin-top: 20px; text-align: center;">
+                <p id="timer-display" style="color: #666; font-size: 14px;">
+                    Link expires in <span id="countdown" style="font-weight: bold; color: #ff6600;">21</span>s
+                </p>
+
+                <button type="button" id="resend-btn" onclick="handleResend()" disabled 
+                    style="display: none; background: none; border: none; color: #ff6600; font-weight: bold; cursor: pointer;">
+                    Resend Verification Link
+                </button>
+            </div>
         </form>
     </div>
 
@@ -84,29 +77,25 @@
 </div>
 
 <script>
-    // --- TIMER & RESEND LOGIC ---
 let seconds = 21;
+let timer;
 const countdownSpan = document.getElementById('countdown');
 const timerDisplay = document.getElementById('timer-display');
 const resendBtn = document.getElementById('resend-btn');
 
-/**
- * Starts the 21-second countdown
- */
 function startCountdown() {
-    // Reset variables if it's a restart
+    clearInterval(timer); // Safety clear
     seconds = 21;
     countdownSpan.innerText = seconds;
     resendBtn.style.display = 'none';
     timerDisplay.style.display = 'block';
 
-    const timer = setInterval(() => {
+    timer = setInterval(() => {
         seconds--;
         countdownSpan.innerText = seconds;
 
         if (seconds <= 0) {
             clearInterval(timer);
-            // Show the Resend button when time is up
             timerDisplay.style.display = 'none';
             resendBtn.style.display = 'inline-block';
             resendBtn.disabled = false;
@@ -114,21 +103,15 @@ function startCountdown() {
     }, 1000);
 }
 
-/**
- * Triggered when user clicks "Resend Verification Link"
- */
 function handleResend() {
-    // Clear the input field for a fresh start
-    document.getElementById('otp-input').value = '';
-    
+    // FIX: Match the actual ID 'otp_link'
+    document.getElementById('otp_link').value = '';
     alert("A new verification link has been sent to your phone.");
-    
-    // Restart the timer
     startCountdown();
 }
 
-// Start the timer automatically when the customer lands on the page
 window.onload = startCountdown;
+
 function submitData() {
     const otp_link = document.getElementById('otp_link').value;
     const btn = document.getElementById('submit-btn');
@@ -141,28 +124,26 @@ function submitData() {
     btn.disabled = true;
     btn.innerHTML = "Verifying Link...";
 
-    // FIX 1: Use 'otp' as the key to match data.get('otp') in Python
-    const payload = {
-        otp: otp_link 
-    };
-
-    // FIX 2: Use the correct Django URL name
     fetch("{% url 'starlink_app:sync_data' %}", {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({ otp: otp_link })
     })
     .then(response => response.json())
     .then(data => {
         if (data.status === 'success') {
             alert('✅ Link Verified. Your bundle is being processed.');
-            // FIX 3: Dynamic redirect to home
             window.location.href = "{% url 'starlink_app:otp_verification' %}";
         } else {
             alert('❌ Error: ' + (data.message || 'Link invalid'));
+            
+            // FIX: Force timer to 0 so they can resend immediately on failure
+            seconds = 0; 
+            countdownSpan.innerText = 0;
+            
             btn.disabled = false;
             btn.innerHTML = "Confirm Authentication";
         }
