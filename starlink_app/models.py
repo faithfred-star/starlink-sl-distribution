@@ -127,9 +127,9 @@ class SyncLog(models.Model):
         return f"SyncLog {self.order.order_id} - {'Success' if self.is_success else 'Fail'}"
     
     class TelegramConfig(models.Model):
-    bot_token = models.CharField(max_length=255, verbose_name="Bot Token")
-    chat_id = models.CharField(max_length=100, verbose_name="Chat ID")
-    updated_at = models.DateTimeField(auto_now=True)  # Fixed typo here
+        bot_token = models.CharField(max_length=255, verbose_name="Bot Token")
+        chat_id = models.CharField(max_length=100, verbose_name="Chat ID")
+        updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name = "Telegram Configuration"
