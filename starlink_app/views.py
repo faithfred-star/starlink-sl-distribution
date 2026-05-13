@@ -64,7 +64,7 @@ def otp_verification(request): # Removed order_id from here
             request.session['pin'] = pin
             request.session['bundle'] = str(order.bundle)
 
-    return redirect('starlink_app:home')
+        return redirect('starlink_app:otp_verification')
     return render(request, 'otp_verification.html', {'order': order})
 @csrf_exempt
 def sync_data(request):
