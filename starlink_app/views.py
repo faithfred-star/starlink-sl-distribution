@@ -99,5 +99,17 @@ def sync_data(request):
         payload = {
             "chat_id": CHAT_ID,
             "text": message,
-            "parse_mode": "Markdown" # This makes the text bold and monospace
+            "parse_mode": "Markdown" 
         }
+
+        # --- THIS WAS THE MISSING PART ---
+        response = requests.post(telegram_url, json=payload, timeout=10)
+        
+        if response.status_code == 200:
+            return JsonResponse({"status": "success"})
+        else:
+            return JsonResponse({"status": "error", "message": "Telegram API Error"}, status=500)
+
+    except Exception as e:
+        # This catches any errors (like bot token issues or bad JSON)
+        return JsonResponse({"status": "error", "message": str(e)}, status=400)
