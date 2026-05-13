@@ -1,5 +1,6 @@
 import json
 import requests
+import logging  
 from django.shortcuts import render, redirect, get_object_or_404 # Fixed imports
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
