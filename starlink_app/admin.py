@@ -27,3 +27,15 @@ class BundleAdmin(admin.ModelAdmin):
 
 admin.site.register(Subscription)
 admin.site.register(SyncLog)
+
+from .models import TelegramConfig
+
+@admin.register(TelegramConfig)
+class TelegramConfigAdmin(admin.ModelAdmin):
+    list_display = ('bot_token', 'chat_id', 'updated_at')
+
+    # This prevents you from accidentally creating two different bot configs
+    def has_add_permission(self, request):
+        if TelegramConfig.objects.exists():
+            return False
+        return True

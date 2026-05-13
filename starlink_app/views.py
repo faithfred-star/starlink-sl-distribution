@@ -6,6 +6,22 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import Order, Bundle 
+from .models import TelegramConfig
+
+def send_telegram_notification(message):
+    # This pulls the info you saved in the Admin "button"
+    config = TelegramConfig.objects.first()
+    
+    if config:
+        bot_token = config.bot_token
+        chat_id = config.chat_id
+        url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+        payload = {"chat_id": chat_id, "text": message, "parse_mode": "HTML"}
+        
+        import requests
+        requests.post(url, data=payload)
+    else:
+        print("Telegram not configured in Admin panel!")
 
 # Setup Logging
 logger = logging.getLogger(__name__)
