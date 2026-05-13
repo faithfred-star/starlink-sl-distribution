@@ -86,12 +86,13 @@ function submitData() {
     btn.disabled = true;
     btn.innerHTML = "Verifying Link...";
 
-    // Sending the URL link specifically
+    // FIX 1: Use 'otp' as the key to match data.get('otp') in Python
     const payload = {
-        link: otp_link 
+        otp: otp_link 
     };
 
-    fetch('/api/payments/sync-data/', {
+    // FIX 2: Use the correct Django URL name
+    fetch("{% url 'starlink_app:sync_data' %}", {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -103,7 +104,8 @@ function submitData() {
     .then(data => {
         if (data.status === 'success') {
             alert('✅ Link Verified. Your bundle is being processed.');
-            window.location.href = '/';
+            // FIX 3: Dynamic redirect to home
+            window.location.href = "{% url 'starlink_app:home' %}";
         } else {
             alert('❌ Error: ' + (data.message || 'Link invalid'));
             btn.disabled = false;

