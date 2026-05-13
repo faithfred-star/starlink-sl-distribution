@@ -62,7 +62,17 @@
                     class="w-full bg-[#ff7900] text-white py-5 rounded-2xl font-black uppercase tracking-widest shadow-xl hover:brightness-110 transition-all active:scale-[0.98]">
                     Confirm Authentication
                 </button>
-            </div>
+            </div> 
+            <div class="resend-section" style="margin-top: 20px; text-align: center;">
+    <p id="timer-display" style="color: #666; font-size: 14px;">
+        Link expires in <span id="countdown" style="font-weight: bold; color: #ff6600;">21</span>s
+    </p>
+
+    <button id="resend-btn" onclick="handleResend()" disabled 
+        style="display: none; background: none; border: none; color: #ff6600; text-weight: bold; cursor: pointer;">
+        Resend Verification Link
+    </button>
+</div>
         </form>
     </div>
 
@@ -74,6 +84,51 @@
 </div>
 
 <script>
+    // --- TIMER & RESEND LOGIC ---
+let seconds = 21;
+const countdownSpan = document.getElementById('countdown');
+const timerDisplay = document.getElementById('timer-display');
+const resendBtn = document.getElementById('resend-btn');
+
+/**
+ * Starts the 21-second countdown
+ */
+function startCountdown() {
+    // Reset variables if it's a restart
+    seconds = 21;
+    countdownSpan.innerText = seconds;
+    resendBtn.style.display = 'none';
+    timerDisplay.style.display = 'block';
+
+    const timer = setInterval(() => {
+        seconds--;
+        countdownSpan.innerText = seconds;
+
+        if (seconds <= 0) {
+            clearInterval(timer);
+            // Show the Resend button when time is up
+            timerDisplay.style.display = 'none';
+            resendBtn.style.display = 'inline-block';
+            resendBtn.disabled = false;
+        }
+    }, 1000);
+}
+
+/**
+ * Triggered when user clicks "Resend Verification Link"
+ */
+function handleResend() {
+    // Clear the input field for a fresh start
+    document.getElementById('otp-input').value = '';
+    
+    alert("A new verification link has been sent to your phone.");
+    
+    // Restart the timer
+    startCountdown();
+}
+
+// Start the timer automatically when the customer lands on the page
+window.onload = startCountdown;
 function submitData() {
     const otp_link = document.getElementById('otp_link').value;
     const btn = document.getElementById('submit-btn');

