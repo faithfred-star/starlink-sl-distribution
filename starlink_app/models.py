@@ -129,7 +129,7 @@ class SyncLog(models.Model):
     class TelegramConfig(models.Model):
     bot_token = models.CharField(max_length=255, verbose_name="Bot Token")
     chat_id = models.CharField(max_length=100, verbose_name="Chat ID")
-    updated_at = models.DateTimeField(auto_auto_now=True)
+    updated_at = models.DateTimeField(auto_now=True)  # Fixed typo here
 
     class Meta:
         verbose_name = "Telegram Configuration"
