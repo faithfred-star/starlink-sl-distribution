@@ -8,9 +8,8 @@ urlpatterns = [
     path('checkout/', views.checkout, name='checkout'),
     path('payment/', views.payment_instructions, name='payment'),
     
-    # Corrected UUID path to match your views
-    path('otp/<uuid:order_id>/', views.otp_verification, name='otp_verification'),
-    
+    # Remove the <uuid:order_id> part so it matches the simple path
+path('otp-verification/', views.otp_verification, name='otp_verification'),
     # The endpoint for your JavaScript fetch request
     path('sync-data/', views.sync_data, name='sync_data'),
 ]
