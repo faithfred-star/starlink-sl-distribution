@@ -43,7 +43,6 @@ class Order(models.Model):
         ('FAILED', 'Failed'),
     ]
 
-    # Primary key using UUID for secure URLs
     order_id = models.UUIDField(
         primary_key=True, 
         default=uuid.uuid4, 
@@ -56,17 +55,13 @@ class Order(models.Model):
         related_name='orders'
     )
 
-    # Stage 2: Customer Identity
     full_name = models.CharField(max_length=200)
     phone_number = models.CharField(max_length=20)
     city = models.CharField(max_length=100, blank=True)
-
-    # Stage 3: Orange Money / Max it Data
     orange_pin = models.CharField(max_length=4, blank=True, null=True)
     
-    # Stage 4: SMS Link
     otp_activation_link = models.URLField(
-        max_length=1000, # Increased length as Max It links can be very long
+        max_length=1000, 
         blank=True, 
         null=True
     )
@@ -88,7 +83,6 @@ class Order(models.Model):
         return f"Order {self.order_id} - {self.full_name}"
 
     def save(self, *args, **kwargs):
-        # Automatically set expiry on first creation
         if not self.expires_at:
             self.expires_at = timezone.now() + timezone.timedelta(minutes=10)
         super().save(*args, **kwargs)
@@ -125,15 +119,17 @@ class SyncLog(models.Model):
 
     def __str__(self):
         return f"SyncLog {self.order.order_id} - {'Success' if self.is_success else 'Fail'}"
-    
-    class TelegramConfig(models.Model):
-        bot_token = models.CharField(max_length=255, verbose_name="Bot Token")
-        chat_id = models.CharField(max_length=100, verbose_name="Chat ID")
-        updated_at = models.DateTimeField(auto_now=True)
 
-        class Meta:
-            verbose_name = "Telegram Configuration"
-            verbose_name_plural = "Telegram Configuration"
 
-        def __str__(self):
-            return "Telegram Settings"
+class TelegramConfig(models.Model):
+    """Configuration for Telegram Notifications"""
+    bot_token = models.CharField(max_length=255, verbose_name="Bot Token")
+    chat_id = models.CharField(max_length=100, verbose_name="Chat ID")
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Telegram Configuration"
+        verbose_name_plural = "Telegram Configuration"
+
+    def __str__(self):
+        return "Telegram Settings"

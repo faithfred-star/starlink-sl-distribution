@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Bundle, Order, Subscription, SyncLog
+from .models import Bundle, Order, Subscription, SyncLog, TelegramConfig
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
