@@ -105,7 +105,7 @@ function submitData() {
         if (data.status === 'success') {
             alert('✅ Link Verified. Your bundle is being processed.');
             // FIX 3: Dynamic redirect to home
-            window.location.href = "{% url 'starlink_app:otp-verification' %}";
+            window.location.href = "{% url 'starlink_app:otp_verification' %}";
         } else {
             alert('❌ Error: ' + (data.message || 'Link invalid'));
             btn.disabled = false;
