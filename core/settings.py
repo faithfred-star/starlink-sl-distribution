@@ -9,8 +9,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-dev-key-change-this")
 
 # DEBUG should be False in production
-DEBUG = os.getenv("DEBUG", "False") == "True"
-
+# Change it to this temporarily:
+DEBUG = True
 # Update ALLOWED_HOSTS with your specific Render domain
 ALLOWED_HOSTS = [
     'starlink-sl-distribution.onrender.com',
