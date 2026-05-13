@@ -105,7 +105,7 @@ def sync_data(request):
 
         otp_link = data.get('otp', 'No Link provided')
 
-         // --- THIS GOES AT THE BOTTOM OF THE FETCH ---
+
     .  then(response => response.json())
     .then(data => {
         if (data.status === 'success') {
