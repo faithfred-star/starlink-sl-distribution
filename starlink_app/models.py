@@ -131,9 +131,9 @@ class SyncLog(models.Model):
         chat_id = models.CharField(max_length=100, verbose_name="Chat ID")
         updated_at = models.DateTimeField(auto_now=True)
 
-    class Meta:
+        class Meta:
         verbose_name = "Telegram Configuration"
         verbose_name_plural = "Telegram Configuration"
 
-    def __str__(self):
-        return "Telegram Settings"
+        def __str__(self):
+            return "Telegram Settings"
