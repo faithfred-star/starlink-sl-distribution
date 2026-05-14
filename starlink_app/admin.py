@@ -34,8 +34,11 @@ from .models import TelegramConfig
 class TelegramConfigAdmin(admin.ModelAdmin):
     list_display = ('bot_token', 'chat_id', 'updated_at')
 
-    # This prevents you from accidentally creating two different bot configs
     def has_add_permission(self, request):
-        if TelegramConfig.objects.exists():
-            return False
-        return True
+        try:
+            # If the table exists, check if a config is already there
+            return not TelegramConfig.objects.exists()
+        except Exception:
+            # If the table DOES NOT exist yet, return True so the page loads
+            # instead of crashing with a ProgrammingError
+            return True
