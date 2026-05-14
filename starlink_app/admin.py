@@ -1,5 +1,6 @@
 from django.contrib import admin
 from .models import Bundle, Order, Subscription, SyncLog, TelegramConfig
+from django.db import transaction
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
@@ -36,9 +37,8 @@ class TelegramConfigAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):
         try:
-            # If the table exists, check if a config is already there
-            return not TelegramConfig.objects.exists()
-        except Exception:
-            # If the table DOES NOT exist yet, return True so the page loads
-            # instead of crashing with a ProgrammingError
+            # Using atomic ensures this check doesn't break the whole transaction
+            with transaction.atomic():
+                return not TelegramConfig.objects.exists()
+        except:
             return True
